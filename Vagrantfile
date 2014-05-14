@@ -53,19 +53,10 @@ Vagrant.configure("2") do |config|
 	# Provisioners                  #
 	#################################
 	
-	# Upgrade all packages
-	config.vm.provision :shell, :inline =>
-   "if [[ ! -f /yum-update-run ]]; then yum update -y && touch /yum-update-run; fi"
-
-  # Install ansible and requirements
-  config.vm.provision :shell, :inline =>
-   "if [[ ! -f /yum-python-run ]]; then yum -y install python-devel python-setuptools && easy_install pip && pip install ansible && touch /yum-python-run; fi"
-
-  # Create private key for virtual machine and allow it to connect to iself, also add host to known hosts
-  config.vm.provision :shell, :inline =>
-   "if [[ ! -f /ssh-key-run ]]; then ssh-keygen -t rsa -N \"\" -f ~/.ssh/id_rsa && cat ~/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys && ssh-keyscan -H 127.0.0.1 >> ~/.ssh/known_hosts && touch /ssh-key-run; fi"
-
-  # RUN ANSIBLE
+	# Install requirements
+	config.vm.provision :shell, path: "provision.sh"
+  
+  # Run ansible on virtual host
   config.vm.provision :shell, :inline =>
    "export PYTHONUNBUFFERED=1; ansible-playbook /vagrant/ansible/main.yml --inventory-file=/vagrant/ansible/hosts-local --user=vagrant"
 
