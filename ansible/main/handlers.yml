@@ -1,0 +1,15 @@
+---
+
+- name: Restart MySQL
+  service: name=mysql state=restarted enabled=yes
+
+- name: Restart Apache
+  service: name=httpd state=restarted enabled=yes
+
+- name: Restart Varnish
+  service: name=varnish state=restarted enabled=yes
+
+- name: Drupal Clear Cache
+  shell: drush cc all chdir={{apache_docroot}} 
+  ignore_errors: yes
+  sudo: no

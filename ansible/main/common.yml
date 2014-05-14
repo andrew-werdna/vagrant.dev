@@ -1,0 +1,41 @@
+---
+
+# http://www.it-hure.de/2013/07/thank-you-seth-vidal-my-first-ansible-playbook/
+- name: Get extra yum repos
+  get_url: dest={{item.dest}} url={{item.url}}
+  with_items: extra_repos
+
+- name: Install extra yum repos
+  yum: pkg={{item.dest}} state=installed disable_gpg_check=yes
+  with_items: extra_repos
+
+- name: Install essential packages
+  yum: name={{item}} state=present
+  with_items:
+  - man
+  - git
+  - nano
+  - mlocate
+  - python-simplejson # Required for many ansible modules
+  - libselinux-python # Required for ansible file operations on servers that have SElinux enabled
+  - python-keyczar  # Required for ansible accelerated mode
+
+# Requires package yum-cron (runs nightly updates)
+#- name: Activate yum autoupdate
+#  service: enabled=yes state=started name=yum-cron
+
+#- name: Upgrade all packages (this might take time)
+#  command: yum update -y
+
+# disable fastestmirror
+# /etc/yum/pluginconf.d/fastestmirror.conf
+
+- name: Check if firewall running
+  shell: lsmod | grep ip_tables || true
+  register: iptables_module
+  changed_when: iptables_module.stdout != ''
+  when: server_environment == "local" or server_environment == "staging"
+
+- name: Disable firewall
+  shell: "/etc/init.d/iptables save && /etc/init.d/iptables stop && chkconfig iptables off"
+  when: iptables_module.changed

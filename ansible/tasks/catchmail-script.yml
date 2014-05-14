@@ -1,0 +1,17 @@
+---
+
+# http://martinvalasek.com/blog/how-to-catch-emails-sent-with-php-on-your-local-server
+- name: Create /var/log/mail directory
+  file: state=directory path=/var/log/mail owner=root group=root mode=0777
+  when: server_environment == "local"
+
+- name: Install sendmail script
+  template: src=bin-sendmail.j2 dest=/usr/local/bin/sendmail owner=root group=root mode=0755
+  tags: configure
+  when: server_environment == "local"
+
+- name: Configure sendmail script for PHP
+  template: src=php-sendmail-ini.j2 dest=/etc/php.d/sendmail-simple.ini
+  notify: Restart Apache
+  tags: configure
+  when: server_environment == "local"

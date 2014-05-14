@@ -1,0 +1,82 @@
+---
+
+- name: Install required packages
+  yum: name={{item}} state=present
+  notify: 
+  - Restart Apache
+  #- Restart Varnish
+  with_items:
+  - ImageMagick 
+  - memcached
+  - httpd
+  #- varnish
+  - php
+  - php-soap
+  - php-mcrypt
+  - php-xml
+  - php-mbstring
+  - php-mysql
+  - php-curl
+  - php-gd
+  - php-pecl-memcached
+  - php-pecl-xdebug
+  - php-pecl-apc
+  #- newrelic-php5
+  # HTTPS
+  - mod_ssl
+  - openssl
+  #- php-pear   # Installs pecl command
+  #- php-devel  # Required for pecl install
+  #- memcached-devel # Required for "pecl install memcache"
+  - php-drush-drush
+
+  # IUS repository php53 packages (later version)
+  #- php53u
+  #- php53u-mysql
+  #- php53u-curl
+  #- php53u-gd
+  #- php53u-pecl-memcached
+  #- php53u-pecl-xdebug
+
+- name: Allow everyone to read http logs
+  file: state=directory path=/var/log/httpd owner=root group=root mode=0755
+
+- name: Setup | Disable default apache welcome site
+  file: state=absent path=/etc/httpd/conf.d/welcome.conf
+  notify: Restart Apache
+
+- include: ../tasks/centos-selfsigned.yml
+
+- name: Configure | Apache default configuration
+  template: src=apache-httpd-conf.j2 dest=/etc/httpd/conf/httpd.conf owner=root group=root mode=0644
+  notify: Restart Apache
+  tags: configure
+
+#- name: Configure | Apache extra configuration
+#  template: src=apache-conf.j2 dest=/etc/httpd/conf.d/sff.conf owner=root group=root mode=0644
+#  notify: Restart Apache
+#  tags: configure
+
+- name: Configure | WWW sites configuration
+  template: src=apache-sites-conf.j2 dest=/etc/httpd/conf.d/sites.conf owner=root group=root mode=0644
+  notify: Restart Apache
+  tags: configure
+
+- name: Configure | PHP configuration
+  template: src=php-ini.j2 dest=/etc/php.d/sff.ini owner=root group=root mode=0644
+  notify: Restart Apache
+  tags: configure
+
+- include: ../tasks/catchmail-script.yml
+#- include: tasks/mailcatcher.yml
+
+- include: ../tasks/debug.yml
+
+- name: Start Services
+  service: name={{item}} state=started enabled=true
+  with_items:
+  #- varnish
+  - memcached
+  - httpd
+
+

@@ -1,0 +1,10 @@
+---
+
+sites:
+- id: vagrant
+  host: vagrant.dev
+  webroot: webroot
+  database:
+  - db_name: vagrant_example
+    db_user: vagrant_example
+    db_pass: vagrant_example

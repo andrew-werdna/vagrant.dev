@@ -1,0 +1,38 @@
+---
+
+- name: Setup common things on all servers
+  hosts: all
+  gather_facts: no
+  sudo: yes
+  vars_files:
+  - vars-global.yml
+  tasks:
+  - include: main/common.yml
+  handlers:
+  - include: main/handlers.yml
+
+- name: Provision and deploy web servers
+  hosts: webservers
+  #accelerate: true
+  gather_facts: yes
+  sudo: yes
+  vars_files:
+  - vars-global.yml
+  - vars-sites.yml
+  tasks:
+  - include: main/web.yml
+  handlers:
+  - include: main/handlers.yml
+
+- name: Provision and deploy database servers
+  hosts: dbservers
+  #accelerate: true
+  gather_facts: yes
+  sudo: yes
+  vars_files:
+  - vars-global.yml
+  - vars-sites.yml
+  tasks:
+  - include: main/database.yml
+  handlers:
+  - include: main/handlers.yml

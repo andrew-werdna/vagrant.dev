@@ -1,0 +1,50 @@
+---
+
+- name: Mailcatcher | Install required packages
+  yum: name={{item}} state=present
+  with_items:
+  - rubygems # Required for mailcatcher
+  - ruby-devel # Required for building gems
+  - make # Required for building gems
+  - gcc-c++ # Required for building gems
+  - sqlite-devel
+
+
+- name: Mailcatcher | Check rubygems version
+  command: gem -v
+  register: rubygems_version
+  changed_when: rubygems_version.stdout == '1.3.7'
+
+- name: Mailcatcher | Update rubygems to latest version
+  command: gem update --system
+  when: rubygems_version.changed
+
+# Was required for mailcatcher, but no more?
+#- name: Install rubydocs (slow build)
+#  gem: name=rdoc state=present
+
+
+#- name: Install mailcatcher (very slow)
+#  gem: name=mailcatcher state=present
+
+# For some reason this wont work using ansible gem module, must use actual command
+- name: Mailcatcher | Install mailcatcher (very slow)
+  command: gem install mailcatcher
+
+- name: Mailcatcher | Configure Mailcatcher for PHP
+  template: src=php-mailcatcher-ini.j2 dest=/etc/php.d/mailcatcher.ini owner=root group=root mode=0644
+  notify: Restart Apache
+  tags: configure
+
+#- name: Install Mailcatcher upstart script
+#  template: src=upstart-mailcatcher.j2 dest=/etc/init/mailcatcher.conf
+#  tags: configure
+
+- name: Mailcatcher | Check mailcatcher running
+  shell: ps ax | grep -v grep | grep -c mailcatcher || true
+  register: mailcatcher_ps_grep
+  changed_when: mailcatcher_ps_grep.stdout == '0'
+
+- name: Mailcatcher | Start mailcatcher
+  command: mailcatcher --http-ip=0.0.0.0
+  when: mailcatcher_ps_grep.changed

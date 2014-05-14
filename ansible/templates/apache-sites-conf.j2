@@ -1,0 +1,90 @@
+NameVirtualHost *:80
+
+{% for site in sites %}
+
+<VirtualHost *:80>
+  ServerName {{ site.host }}
+  DocumentRoot {{sites_dir}}/{{ site.host }}/{{ site.webroot }}
+  RewriteEngine On
+  
+  <Directory {{sites_dir}}/{{ site.host }}/{{ site.webroot }} >
+    Options FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+  </Directory>
+  
+  <Directory />
+    Options FollowSymLinks
+    AllowOverride None
+  </Directory>
+
+  <Location /server-status>
+    SetHandler server-status
+    Order Allow,Deny
+    Allow from all
+  </Location>
+
+  # Deny access to .svn and .git
+  <DirectoryMatch "\.(svn|git)">
+    Deny from all
+  </DirectoryMatch>
+
+
+  LogLevel info
+  ErrorLog {{ apache_log_dir }}/{{ site.id }}-error.log
+
+  # Log real client ip when behind proxy (varnish)
+  # Source: http://www.techstacks.com/howto/log-client-ip-and-xforwardedfor-ip-in-apache.html
+  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+  LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+  SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+  CustomLog {{ apache_log_dir }}/{{ site.id }}-access.log combined env=!forwarded
+  CustomLog {{ apache_log_dir }}/{{ site.id }}-access.log proxy env=forwarded
+
+  RewriteEngine On
+  RewriteLog {{ apache_log_dir }}/{{ site.id }}-rewrite.log
+  # level 0 => Do not log rewrite
+  RewriteLogLevel 0
+
+</VirtualHost>
+
+<VirtualHost *:443>
+  ServerName {{ site.host }}
+  DocumentRoot {{sites_dir}}/{{ site.host }}/{{ site.webroot }}
+  RewriteEngine On
+  
+  <Directory {{sites_dir}}/{{ site.host }}/{{ site.webroot }}>
+    Options FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+  </Directory>
+  
+  <Directory />
+    Options FollowSymLinks
+    AllowOverride None
+  </Directory>
+
+  <Location /server-status>
+    SetHandler server-status
+
+    Order Allow,Deny
+    Allow from all
+  </Location>
+
+  LogLevel info
+  ErrorLog {{ apache_log_dir }}/{{ site.id }}-error.log
+  CustomLog {{ apache_log_dir }}/{{ site.id }}-access.log combined
+
+  RewriteEngine On
+  RewriteLog {{ apache_log_dir }}/{{ site.id }}-rewrite.log
+  # level 0 => Do not log rewrite
+  RewriteLogLevel 0
+
+  SSLEngine on
+  SSLCertificateFile /etc/pki/tls/certs/private.crt
+  SSLCertificateKeyFile /etc/pki/tls/private/ca.key
+</VirtualHost>
+
+{% endfor %}

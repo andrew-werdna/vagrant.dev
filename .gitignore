@@ -1,0 +1,12 @@
+# Ignore current running vagrant info
+.vagrant
+
+# Ignore all sites
+/sites/*
+!/sites/vagrant.dev
+
+# Ignore sites config
+/ansible/vars-sites.yml
+
+# Ignore deploy folder, I use it for symlinking in wordpress stuff
+/deploy/

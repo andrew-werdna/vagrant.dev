@@ -1,0 +1,27 @@
+---
+
+#- stat: path=/etc/pki/tls/private/ca.key
+#  register: tls_ca_key
+
+#- name: Generate private key
+#  command: openssl genrsa -out ca.key 1024 creates=/etc/pki/tls/private/ca.key
+#
+#- name: Generate CSR
+#  command: openssl req -new -key ca.key -out ca.csr creates=/etc/pki/tls/private/ca.key
+#
+#- name: Generate self signed key
+#  command: openssl x509 -req -days 365 -in ca.csr -signkey ca.key -out ca.crt creates=/etc/pki/tls/private/ca.key
+#
+#- name: Copy files into place
+#  command: cp {{item}} creates=/etc/pki/tls/private/ca.key
+#  sudo: yes
+#  with_items: 
+#  - "ca.crt /etc/pki/tls/certs"
+#  - "ca.key /etc/pki/tls/private/ca.key"
+#  - "ca.csr /etc/pki/tls/private/ca.csr"
+
+
+# http://serialized.net/2013/04/simply-generating-self-signed-ssl-certs-with-ansible/
+- name: Create self-signed SSL cert
+  command: openssl req -new -nodes -x509 -subj "/C=SE/ST=Vagrant/L=Vagrant/O=Vagrant/CN={{ansible_fqdn}}" -days 3650 -keyout /etc/pki/tls/private/ca.key -out /etc/pki/tls/certs/private.crt -extensions v3_ca creates=/etc/pki/tls/certs/private.crt
+  #notify: reload apache

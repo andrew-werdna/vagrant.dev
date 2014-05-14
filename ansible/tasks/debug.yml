@@ -1,0 +1,28 @@
+---
+# Local development debug features
+
+- name: Disable APC
+  file: state=absent path=/etc/php.d/apc.ini
+  notify: Restart Apache
+  tags: configure
+
+#- name: Generate SSL cert
+#  command: make-ssl-cert generate-default-snakeoil --force-overwrite creates=/etc/ssl/private/ssl-cert-snakeoil.key
+#  when: server_environment == "local" 
+
+# This is done through package php-pecl-xdebug instead
+#- name: Test for XDebug install
+#  shell: pecl list | grep -i 'xdebug' || true
+#  register: php_pecl_xdebug_exists
+#  when: server_environment == "local" 
+#  changed_when: php_pecl_xdebug_exists.stdout != ''
+#
+#- name: Install XDebug 
+#  command: pecl install xdebug
+#  when: php_pecl_xdebug_exists.changed
+#  notify: Restart Apache
+
+- name: Configure XDebug for PHP
+  template: src=php-xdebug-ini.j2 dest=/etc/php.d/xdebug.ini owner=root group=root mode=0644
+  notify: Restart Apache
+  tags: configure

@@ -1,0 +1,43 @@
+---
+##
+# MySQL database setup, this does the equivalent of mysql_secure_installation.
+#
+# Distribution independent.
+#
+
+- name: MySQL | Check if /root/.my.cnf exists
+  stat: path=/root/.my.cnf
+  register: rootmycnf
+
+- name: MySQL | Set the root password
+  mysql_user: user=root password={{database_root_pass}} host=localhost
+  when: server_environment == "local" and (rootmycnf.stat.exists is defined and rootmycnf.stat.exists == false)
+
+- name: MySQL | Config for easy access as root user
+  template: src=mysql-root.cnf.j2 dest=/root/.my.cnf
+  when: server_environment == "local"
+
+- name: MySQL | Delete anonymous MySQL server user for hostname
+  mysql_user: user="" host="{{ansible_hostname}}" state="absent" login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+- name: MySQL | Delete anonymous MySQL server user for localhost
+  mysql_user: user="" state="absent"  login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+- name: MySQL | Secure the MySQL root user for IPV6 localhost (::1)
+  mysql_user: user="root" password="{{database_root_pass}}" host="::1" login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+- name: MySQL | Secure the MySQL root user for IPV4 localhost (127.0.0.1)
+  mysql_user: user="root" password="{{database_root_pass}}" host="127.0.0.1" login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+#- name: MySQL | Secure the MySQL root user for localhost domain (localhost)
+#  mysql_user: user="root" password="{{database_root_pass}}" host="localhost" login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+- name: MySQL | Secure the MySQL root user for hostname domain
+  mysql_user: user="root" password="{{database_root_pass}}" host="{{ansible_hostname}}" login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+- name: MySQL | Remove the MySQL test database
+  mysql_db: db=test state=absent login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+
+- name: MySQL | Add vagrant user and Grant all privileges
+  mysql_user: user="vagrant" password="vagrant" host="%" priv=*.*:ALL,GRANT state=present login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+  when: server_environment == "local" 

@@ -1,0 +1,43 @@
+---
+
+- name: Install required packages
+  yum: name={{item}} state=present
+  with_items:
+  - mysql-server
+  - MySQL-python
+
+#- name: Configure | MySql configuration
+#  template: src=templates/mysql.cnf.j2 dest=/etc/my.cnf
+#  notify: Restart MySQL
+#  tags: configure
+#  when: server_environment == "local"
+
+- name: Start Mysql Service
+  service: name=mysqld state=started enabled=true
+
+  # Secure MySQL installation
+- include: ../tasks/mysql-secure.yml
+
+
+# TODO loop inside sites.database?
+- name: Create databases
+  mysql_db: name={{ item.1.db_name }} encoding=utf8 collation=utf8_swedish_ci state=present login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+  with_subelements:
+  - sites
+  - database
+
+- name: Create database users
+  mysql_user: name={{item.1.db_user}} password={{item.1.db_pass}} priv="{{item.1.db_name}}.*:ALL" host='%' state=present login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+  with_subelements:
+  - sites
+  - database
+
+# TODO This requires sync-hosts-stuff, wont work yet
+
+## Dump database on production
+#- include: sync-dump-production.yml
+#  when: server_environment == "local" and database_created.changed
+#
+## Import database on vagrant machine
+#- include: sync-import-local.yml
+#  when: server_environment == "local" and database_created.changed

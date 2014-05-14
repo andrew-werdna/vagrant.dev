@@ -1,0 +1,5 @@
+[webservers]
+127.0.0.1 server_environment=local
+
+[dbservers]
+127.0.0.1 server_environment=local

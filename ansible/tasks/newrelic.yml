@@ -1,0 +1,15 @@
+---
+
+- name: Install New Relic
+  shell: export NR_INSTALL_KEY= NR_INSTALL_SILENT=true; newrelic-install install creates=/etc/php.d/newrelic.ini
+  notify: Restart Apache
+
+- name: Install New Relic license
+  lineinfile: dest=/etc/php.d/newrelic.ini regexp='^newrelic.license = ' line='newrelic.license = "{{newrelic_license}}"'
+  tags: configure
+  notify: Restart Apache
+
+- name: Set New Relic appname
+  lineinfile: dest=/etc/php.d/newrelic.ini regexp='newrelic.appname = ' line='newrelic.appname = "{{ansible_hostname}}"'
+  tags: configure
+  notify: Restart Apache

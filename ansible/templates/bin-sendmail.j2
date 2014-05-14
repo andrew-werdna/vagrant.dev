@@ -1,0 +1,15 @@
+#!/usr/bin/php
+<?php
+$input = file_get_contents('php://stdin');
+preg_match("|^To: .*?<(.*)>\n|", $input, $matches);
+$datestring = date("Y-m-d\TH-i-s");
+if ( isset($matches[1]) ) {
+	$filename = tempnam('/var/log/mail', $datestring .'_'. $matches[1] . '.');
+} else {
+	preg_match("|^To: (.*)\n|", $input, $matches);
+	$filename = tempnam('/var/log/mail', $datestring .'_'. $matches[1] . '.');
+	if ( !isset($matches[1]) ) {
+		$filename = tempnam('/var/log/mail', $datestring . '.');
+	}
+}
+file_put_contents($filename, $input);
