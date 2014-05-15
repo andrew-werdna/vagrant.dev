@@ -25,6 +25,9 @@ Vagrant.configure("2") do |config|
 	# Forward MySql port on 33066, used for connecting admin-clients to localhost:33066
 	config.vm.network :forwarded_port, guest: 3306, host: 33066
 
+	# Set permissions for apache on shared project folder
+	config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", owner: "vagrant", group: "apache", mount_options: ["dmode=775,fmode=664"]
+
 	# If you want to share using NFS uncomment this line 
 	# (30x faster performance on mac/linux hosts when using VirtualBox)
 	# http://docs.vagrantup.com/v2/synced-folders/nfs.html
