@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
 	# The url is from where the 'config.vm.box' box will be fetched if it
 	# doesn't already exist on the user's system.
 
-	# VirtualBox
+	# This must be a Centos 6 box for the setup to work
 	config.vm.box = "centos64"
 	config.vm.box_url = "https://dl.dropboxusercontent.com/u/383013/centos64-x86-64-mini.box"
 
@@ -42,6 +42,10 @@ Vagrant.configure("2") do |config|
 
 	# VirtualBox specific configuration
 	config.vm.provider :virtualbox do |v|
+
+		# If you're having timeout errors or just want to see what the VM is up to, enable this
+		#v.gui = true
+
 		v.customize ["modifyvm", :id, "--cpus", 1] # Never set more than 1 cpu, degrades performance
 		v.customize ["modifyvm", :id, "--memory", 1024]
 
