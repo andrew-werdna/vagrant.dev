@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
 	config.vm.network :forwarded_port, guest: 3306, host: 33066
 
 	# Set permissions for apache on shared project folder
-	config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", owner: "vagrant", group: "apache", mount_options: ["dmode=775,fmode=664"]
+	#config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=664"]
 
 	# If you want to share using NFS uncomment this line 
 	# (30x faster performance on mac/linux hosts when using VirtualBox)
@@ -66,6 +66,10 @@ Vagrant.configure("2") do |config|
   # Run ansible on virtual host
   config.vm.provision :shell, :inline =>
    "export PYTHONUNBUFFERED=1; ansible-playbook /vagrant/ansible/main.yml --inventory-file=/vagrant/ansible/hosts-local --user=vagrant"
+
+   # Now with apache probably installed, remount /vagrant with apache group permission
+  config.vm.provision :shell, run: "always", :inline =>
+   "if [[ -f /etc/sysconfig/httpd ]]; then umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
 
   #config.vm.provision :ansible do |ansible|
   #    ansible.verbose = true
