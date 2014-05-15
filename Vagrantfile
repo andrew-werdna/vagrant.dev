@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
 	# VirtualBox specific configuration
 	config.vm.provider :virtualbox do |v|
 		v.customize ["modifyvm", :id, "--cpus", 1] # Never set more than 1 cpu, degrades performance
-		v.customize ["modifyvm", :id, "--memory", 1200]
+		v.customize ["modifyvm", :id, "--memory", 1024]
 
 		# VirtualBox performance improvements
 		# Found here: https://github.com/xforty/vagrant-drupal/blob/master/Vagrantfile
