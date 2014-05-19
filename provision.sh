@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Copy sites config example for ansible
+if [[ ! -f /vagrant/ansible/vars-sites.yml ]]; then
+	cp /vagrant/ansible/vars-sites.yml.example /vagrant/ansible/vars-sites.yml
+fi
+
 # Upgrade all packages
 if [[ ! -f /provision-update-run ]]; then
 	yum update -y && touch /provision-update-run
