@@ -79,4 +79,23 @@
   - memcached
   - httpd
 
+# FILE DOWNLOAD
+
+# Cant use built in synchronize command since there's no way to speciy a different ssh user with delegate_to or a specific private key
+#- name: Rsync uploaded files
+#  synchronize: src={{item.1.remote_source_path}} dest=/vagrant/sites/{{item.0.host}}/{{item.1.local_target_path}}
+#    archive=no times=yes recursive=yes mode=pull
+#  with_subelements:
+#  - sites
+#  - rsync
+  
+- name: Download uploaded files to virtual machine (this will take a while)
+  command: rsync -rti -e 'ssh -i /vagrant/{{item.1.ssh_private_key}} -o StrictHostKeyChecking=no' {{item.1.ssh_user}}@{{item.1.ssh_host}}:{{item.1.remote_source_path}} /vagrant/sites/{{item.0.host}}/{{item.0.webroot}}/{{item.1.local_target_path}}
+  with_subelements:
+  - sites
+  - rsync
+  when: item.1.ssh_host is defined
+  tags: sync
+  register: rsync_result
+  changed_when: rsync_result.stdout != ""
 
