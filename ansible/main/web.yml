@@ -29,6 +29,7 @@
   #- php-devel  # Required for pecl install
   #- memcached-devel # Required for "pecl install memcache"
   - php-drush-drush
+  - phpmyadmin
 
   # IUS repository php53 packages (later version)
   #- php53u
@@ -69,6 +70,10 @@
 
 - include: ../tasks/catchmail-script.yml
 #- include: tasks/mailcatcher.yml
+- name: Configure | PhpMyAdmin configuration
+  template: src=apache-phpmyadmin-conf.j2 dest=/etc/httpd/conf.d/phpMyAdmin.conf owner=root group=root mode=0644
+  notify: Restart Apache
+  tags: configure
 
 - include: ../tasks/debug.yml
 
