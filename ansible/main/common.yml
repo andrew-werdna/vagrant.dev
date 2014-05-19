@@ -19,6 +19,13 @@
   - python-simplejson # Required for many ansible modules
   - libselinux-python # Required for ansible file operations on servers that have SElinux enabled
   - python-keyczar  # Required for ansible accelerated mode
+  # Extra utils
+  - mc
+  - vim
+  - screen
+  - tmux
+  - curl
+  - subversion
 
 # Requires package yum-cron (runs nightly updates)
 #- name: Activate yum autoupdate
