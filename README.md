@@ -139,7 +139,7 @@ Here we expand on the config above to also copy uploaded files for a drupal proj
 
 The way rsync works, the first time you run this provision it will copy all files, the next time will be faster since it only copies new and changed files.
 
-```json
+```yaml
 sites:
 - id: rsync
   host: rsync.dev
