@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Install apache so we can set group permissions for the user
+if [[ ! -f /etc/sysconfig/httpd ]]; then 
+	yum -y install httpd
+fi
+
 # Copy sites config example for ansible
 if [[ ! -f /vagrant/ansible/vars-sites.yml ]]; then
 	cp /vagrant/ansible/vars-sites.yml.example /vagrant/ansible/vars-sites.yml

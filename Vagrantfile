@@ -65,14 +65,15 @@ Vagrant.configure("2") do |config|
 	
 	# Install requirements
 	config.vm.provision :shell, path: "provision.sh"
+
+	# Now with apache probably installed, remount /vagrant with apache group permission
+  config.vm.provision :shell, run: "always", :inline =>
+   "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then 
+   umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
   
   # Run ansible on virtual host
   config.vm.provision :shell, :inline =>
    "export PYTHONUNBUFFERED=1; ansible-playbook /vagrant/ansible/main.yml --inventory-file=/vagrant/ansible/hosts-local --user=vagrant"
-
-   # Now with apache probably installed, remount /vagrant with apache group permission
-  config.vm.provision :shell, run: "always", :inline =>
-   "if [[ -f /etc/sysconfig/httpd ]]; then umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
 
   #config.vm.provision :ansible do |ansible|
   #    ansible.verbose = true
