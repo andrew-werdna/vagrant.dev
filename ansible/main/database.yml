@@ -18,26 +18,46 @@
   # Secure MySQL installation
 - include: ../tasks/mysql-secure.yml
 
-
-# TODO loop inside sites.database?
 - name: Create databases
   mysql_db: name={{ item.1.db_name }} encoding=utf8 collation=utf8_swedish_ci state=present login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
   with_subelements:
   - sites
   - database
+  when: item.1.db_name is defined
+  register: create_databases_result
+  tags:
+  - sync
+  - configure
+
+#- debug: var=create_databases_result
+#  tags: configure
 
 - name: Create database users
-  mysql_user: name={{item.1.db_user}} password={{item.1.db_pass}} priv="{{item.1.db_name}}.*:ALL" host='%' state=present login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
+  mysql_user: "name={{item.1.db_user}} password={{item.1.db_pass}} priv=\"{{item.1.db_name}}.*:ALL\" host='%' state=present login_user=\"{{database_root_user}}\" login_password=\"{{database_root_pass}}\""
   with_subelements:
   - sites
   - database
+  when: item.1.db_name is defined
+  tags: configure
 
-# TODO This requires sync-hosts-stuff, wont work yet
+# TODO Yes this is kinda awful, but I don't think its possible to do with ansible itself
+- name: Copy database from other server
+  shell: ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "/usr/bin/mysqldump --routines -h{{item.item.1.db_copy.mysql_host}} -u{{item.item.1.db_copy.mysql_user}} -p{{item.item.1.db_copy.mysql_pass}} {{item.item.1.db_copy.remote_database}} > ~/vagrant-dump-{{item.item.1.db_name}}.sql " && scp -C -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}}:~/vagrant-dump-{{item.item.1.db_name}}.sql /home/vagrant/vagrant-dump-{{item.item.1.db_name}}.sql && ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "rm ~/vagrant-dump-{{item.item.1.db_name}}.sql"
+  with_items: create_databases_result.results
+  when: item.changed and item.item.1.db_copy.ssh_user is defined
+  register: database_copy_result
+  tags:
+  - sync
+  - configure
 
-## Dump database on production
-#- include: sync-dump-production.yml
-#  when: server_environment == "local" and database_created.changed
-#
-## Import database on vagrant machine
-#- include: sync-import-local.yml
-#  when: server_environment == "local" and database_created.changed
+#- debug: var=database_copy_result
+#  tags: configure
+
+- name: Import databases
+  mysql_db: name={{item.item.item.1.db_name}} state=import target=/home/vagrant/vagrant-dump-{{item.item.item.1.db_name}}.sql
+  with_items: database_copy_result.results
+  when: item.changed
+  tags:
+  - sync
+  - configure
+

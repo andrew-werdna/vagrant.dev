@@ -28,6 +28,9 @@ Vagrant.configure("2") do |config|
 	# Set permissions for shared folder, otherwise all files might become executable which ansible doesn't like
 	config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=664"]
 
+	# Mount private keys folder with right permissions
+	config.vm.synced_folder "./privatekeys", "/privatekeys", owner: "vagrant", group: "vagrant", mount_options: ["dmode=700,fmode=600"]
+
 	# If you want to share using NFS uncomment this line 
 	# (30x faster performance on mac/linux hosts when using VirtualBox)
 	# http://docs.vagrantup.com/v2/synced-folders/nfs.html

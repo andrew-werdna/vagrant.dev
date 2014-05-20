@@ -68,13 +68,13 @@
   notify: Restart Apache
   tags: configure
 
-- include: ../tasks/catchmail-script.yml
-#- include: tasks/mailcatcher.yml
 - name: Configure | PhpMyAdmin configuration
   template: src=apache-phpmyadmin-conf.j2 dest=/etc/httpd/conf.d/phpMyAdmin.conf owner=root group=root mode=0644
   notify: Restart Apache
   tags: configure
 
+- include: ../tasks/catchmail-script.yml
+#- include: ../tasks/mailcatcher.yml
 - include: ../tasks/debug.yml
 
 - name: Start Services
@@ -95,12 +95,14 @@
 #  - rsync
   
 - name: Download uploaded files to virtual machine (this will take a while)
-  command: rsync -rti -e 'ssh -i /vagrant/{{item.1.ssh_private_key}} -o StrictHostKeyChecking=no' {{item.1.ssh_user}}@{{item.1.ssh_host}}:{{item.1.remote_source_path}} /vagrant/sites/{{item.0.host}}/{{item.0.webroot}}/{{item.1.local_target_path}}
+  command: rsync -rti -e 'ssh -i {{private_key_dir}}/{{item.1.ssh_private_key}} -o StrictHostKeyChecking=no' {{item.1.ssh_user}}@{{item.1.ssh_host}}:{{item.1.remote_source_path}} /vagrant/sites/{{item.0.host}}/{{item.0.webroot}}/{{item.1.local_target_path}}
   with_subelements:
   - sites
   - rsync
   when: item.1.ssh_host is defined
-  tags: sync
+  tags: 
+  - sync
+  - configure
   register: rsync_result
   changed_when: rsync_result.stdout != ""
 

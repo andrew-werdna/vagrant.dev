@@ -10,3 +10,7 @@
 
 # Ignore deploy folder, I use it for symlinking in wordpress stuff
 /deploy/
+
+# Ignore private keys
+/privatekeys/*
+!/privatekeys/put_private_keys_here

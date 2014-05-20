@@ -5,6 +5,28 @@ sites:
   host: vagrant.dev
   webroot: webroot
   database:
-  - db_name: vagrant_example
-    db_user: vagrant_example
-    db_pass: vagrant_example
+  - no: no
+  rsync:
+  - no: no
+
+#- id: forum
+#  host: forum.dev
+#  webroot: webroot
+#  database:
+#  - db_name: forum
+#    db_user: forum
+#    db_pass: forum
+#    db_copy:
+#    - ssh_host: server.example.com
+#      ssh_user: you
+#      ssh_private_key: private_key_in_privatekeys_folder
+#      mysql_host: localhost
+#      mysql_user: db_user
+#      mysql_pass: 123456
+#      remote_database: forum
+#  rsync:
+#  - ssh_host: server.example.com
+#    ssh_user: you
+#    ssh_private_key: private_key_in_privatekeys_folder
+#    remote_source_path: /opt/deploy/client/project/uploads
+#    local_target_path: uploads

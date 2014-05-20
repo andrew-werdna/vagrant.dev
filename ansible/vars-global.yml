@@ -15,3 +15,5 @@ sites_dir: /vagrant/sites
 database_host: localhost
 
 apache_log_dir: /var/log/httpd
+
+private_key_dir: /privatekeys
