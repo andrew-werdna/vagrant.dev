@@ -39,8 +39,7 @@ Vagrant.configure("2") do |config|
 	# Set the hostname
 	config.vm.hostname = "vagrant"
 
-	# Create a private network, which allows host-only access to the machine
-	# using a specific IP.
+	# Create a private network, which allows host-only access to the machine using a specific IP.
 	config.vm.network :private_network, ip: "33.33.33.10"
 
 	# VirtualBox specific configuration
@@ -49,8 +48,11 @@ Vagrant.configure("2") do |config|
 		# If you're having timeout errors or just want to see what the VM is up to, enable this
 		#v.gui = true
 
-		v.customize ["modifyvm", :id, "--cpus", 1] # Never set more than 1 cpu, degrades performance
+		# If you want to give your VM more memory, change this line
 		v.customize ["modifyvm", :id, "--memory", 1024]
+
+		# Never set more than 1 cpu, it might heavily degrade performance
+		v.customize ["modifyvm", :id, "--cpus", 1]
 
 		# VirtualBox performance improvements
 		# Found here: https://github.com/xforty/vagrant-drupal/blob/master/Vagrantfile
@@ -63,7 +65,7 @@ Vagrant.configure("2") do |config|
 	# Provisioners                  #
 	#################################
 	
-	# Install requirements
+	# Install initial requirements
 	config.vm.provision :shell, path: "provision.sh"
 
 	# Now with apache probably installed, remount /vagrant with apache group permission
@@ -71,7 +73,7 @@ Vagrant.configure("2") do |config|
    "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then 
    umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
   
-  # Run ansible on virtual host
+  # Run ansible provision on virtual host
   config.vm.provision :shell, :inline =>
    "export PYTHONUNBUFFERED=1; ansible-playbook /vagrant/ansible/main.yml --inventory-file=/vagrant/ansible/hosts-local --user=vagrant"
 
