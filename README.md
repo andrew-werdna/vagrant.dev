@@ -62,3 +62,104 @@ PHP is configured to send mail via MailCatcher. Web frontend of MailCatcher is r
 Port 33066 is forwarded to MySql, with a default vagrant/vagrant user so you can use your favorite client to administer databases.
 
 You can add XDEBUG\_PROFILE to your GET parameter to generate an xdebug trace, e.g. http://vagrant.dev/?XDEBUG\_PROFILE. You can then investigate at http://local.dev/webgrind/
+
+## Sites configuration
+
+Site configurations are set in the file ```ansible/vars-sites.yml```. These configs automatically set up apache virtual hosts and databases. They can also import databases and rsync uploaded files from a remote server. See examples below.
+
+Whenever you need to apply new configurations all you need to do is run the provisioning again.
+
+    $ vagrant provision
+
+Put your code for the site in the "sites" folder, within a folder named as the "host" in your config.
+
+Also remember to add your new site hosts to your local machine's hosts file.
+
+    33.33.33.10 vagrant.dev project.dev project2.dev
+
+
+### Standard site
+
+Put your web app in the folder ```sites/local.dev/webroot/``` for this site configuration to work.
+
+```yaml
+sites:
+- id: local
+  host: local.dev
+  webroot: webroot
+  database:
+  - no: no
+  rsync:
+  - no: no
+```
+
+### Site with database
+
+Put your web app in the folder ```sites/database.dev/``` for this site configuration to work.
+
+```yaml
+sites:
+- id: database
+  host: database.dev
+  webroot: webroot
+  database:
+  - db_name: my_db
+    db_user: my_db
+    db_pass: my_db
+```
+
+### Automatically copy database from remote server
+
+For this config to work you need an SSH account on a remote server and a MySQL account. For the SSH account you must have Public Key Authentication set up and your private key file needs to exist in the root vagrant directory. All settings under "db_copy" are required.
+
+I use a single private key file without a passphrase for all the servers I need to sync databases and files from. This is a separate private key from the one I usually use, since it has no passphrase it is best to use it only for syncing from development and testing servers. Read more about public and private keys at [help.ubuntu.com](https://help.ubuntu.com/community/SSH/OpenSSH/Keys).
+
+```yaml
+sites:
+- id: copy
+  host: copy.dev
+  webroot: webroot
+  database:
+  - db_name: my_copy
+    db_user: my_copy
+    db_pass: my_copy
+    db_copy:
+      ssh_host: copy.example.com
+      ssh_user: vagrant
+      ssh_private_key: vagrant_id_rsa
+      mysql_host: localhost
+      mysql_user: root
+      mysql_pass: pass
+      remote_database: data
+```
+
+### Automatically copy uploaded files
+
+Here we expand on the config above to also copy uploaded files for a drupal project. This is done using rsync and ssh connections.
+
+The way rsync works, the first time you run this provision it will copy all files, the next time will be faster since it only copies new and changed files.
+
+```json
+sites:
+- id: rsync
+  host: rsync.dev
+  webroot: webroot
+  database:
+  - db_name: my_rsync
+    db_user: my_rsync
+    db_pass: my_rsync
+    db_copy:
+      ssh_host: rsync.example.com
+      ssh_user: vagrant
+      ssh_private_key: vagrant_id_rsa
+      mysql_host: localhost
+      mysql_user: root
+      mysql_pass: pass
+      remote_database: data
+  rsync:
+  - ssh_host: rsync.example.com
+    ssh_user: vagrant
+    ssh_private_key: vagrant_id_rsa
+    remote_source_path: /opt/deploy/project/webroot/sites/default/files/
+    local_target_path: sites/default/files/
+```
