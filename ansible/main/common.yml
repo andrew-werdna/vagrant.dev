@@ -4,13 +4,16 @@
 - name: Get extra yum repos
   get_url: dest={{item.dest}} url={{item.url}}
   with_items: extra_repos
+  tags: install
 
 - name: Install extra yum repos
   yum: pkg={{item.dest}} state=installed disable_gpg_check=yes
   with_items: extra_repos
+  tags: install
 
 - name: Install essential packages
   yum: name={{item}} state=present
+  tags: install
   with_items:
   - man
   - git

@@ -5,6 +5,7 @@
   with_items:
   - mysql-server
   - MySQL-python
+  tags: install
 
 #- name: Configure | MySql configuration
 #  template: src=templates/mysql.cnf.j2 dest=/etc/my.cnf
