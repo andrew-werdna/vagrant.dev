@@ -14,7 +14,7 @@
   when: server_environment == "local" and (rootmycnf.stat.exists is defined and rootmycnf.stat.exists == false)
 
 - name: MySQL | Config for easy access as root user
-  template: src=mysql-root.cnf.j2 dest=/root/.my.cnf
+  template: src=mysql-root-cnf.j2 dest=/root/.my.cnf
   when: server_environment == "local"
 
 - name: MySQL | Delete anonymous MySQL server user for hostname

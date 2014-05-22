@@ -7,17 +7,25 @@
   - MySQL-python
   tags: install
 
-#- name: Configure | MySql configuration
-#  template: src=templates/mysql.cnf.j2 dest=/etc/my.cnf
-#  notify: Restart MySQL
-#  tags: configure
-#  when: server_environment == "local"
+- name: MySql configuration
+  template: src=templates/mysql-cnf.j2 dest=/etc/my.cnf
+  notify: Restart MySQL
+  tags: configure
+  when: server_environment == "local"
 
 - name: Start Mysql Service
   service: name=mysqld state=started enabled=true
 
   # Secure MySQL installation
 - include: ../tasks/mysql-secure.yml
+
+- name: Create database users
+  mysql_user: "name={{item.1.db_user}} password={{item.1.db_pass}} priv=\"{{item.1.db_name}}.*:ALL\" host='%' state=present login_user=\"{{database_root_user}}\" login_password=\"{{database_root_pass}}\""
+  with_subelements:
+  - sites
+  - database
+  when: item.1.db_name is defined
+  tags: configure
 
 - name: Create databases
   mysql_db: name={{ item.1.db_name }} encoding=utf8 collation=utf8_swedish_ci state=present login_user="{{database_root_user}}" login_password="{{database_root_pass}}"
@@ -33,17 +41,9 @@
 #- debug: var=create_databases_result
 #  tags: configure
 
-- name: Create database users
-  mysql_user: "name={{item.1.db_user}} password={{item.1.db_pass}} priv=\"{{item.1.db_name}}.*:ALL\" host='%' state=present login_user=\"{{database_root_user}}\" login_password=\"{{database_root_pass}}\""
-  with_subelements:
-  - sites
-  - database
-  when: item.1.db_name is defined
-  tags: configure
-
 # TODO Yes this is kinda awful, but I don't think its possible to do with ansible itself
 - name: Copy database from other server
-  shell: ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "/usr/bin/mysqldump --routines -h{{item.item.1.db_copy.mysql_host}} -u{{item.item.1.db_copy.mysql_user}} -p{{item.item.1.db_copy.mysql_pass}} {{item.item.1.db_copy.remote_database}} > ~/vagrant-dump-{{item.item.1.db_name}}.sql " && scp -C -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}}:~/vagrant-dump-{{item.item.1.db_name}}.sql /home/vagrant/vagrant-dump-{{item.item.1.db_name}}.sql && ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "rm ~/vagrant-dump-{{item.item.1.db_name}}.sql"
+  shell: ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "mysqldump --routines -h{{item.item.1.db_copy.mysql_host}} -u{{item.item.1.db_copy.mysql_user}} -p{{item.item.1.db_copy.mysql_pass}} {{item.item.1.db_copy.remote_database}} > ~/vagrant-dump-{{item.item.1.db_name}}.sql " && scp -C -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}}:~/vagrant-dump-{{item.item.1.db_name}}.sql /home/vagrant/vagrant-dump-{{item.item.1.db_name}}.sql && ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "rm ~/vagrant-dump-{{item.item.1.db_name}}.sql"
   with_items: create_databases_result.results
   when: item.changed and item.item.1.db_copy.ssh_user is defined
   register: database_copy_result
@@ -53,6 +53,14 @@
 
 #- debug: var=database_copy_result
 #  tags: configure
+
+#- name: Import databases
+#  shell: mysql -u root {{item.item.item.1.db_name}} < /home/vagrant/vagrant-dump-{{item.item.item.1.db_name}}.sql
+#  with_items: database_copy_result.results
+#  when: item.changed
+#  tags:
+#  - sync
+#  - configure
 
 - name: Import databases
   mysql_db: name={{item.item.item.1.db_name}} state=import target=/home/vagrant/vagrant-dump-{{item.item.item.1.db_name}}.sql
