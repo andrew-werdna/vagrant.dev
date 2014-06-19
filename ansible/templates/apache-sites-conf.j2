@@ -1,6 +1,9 @@
 NameVirtualHost *:80
 NameVirtualHost *:443
 
+# Disable send file, does not work with virtualbox shared folders, does not read new files
+EnableSendfile off
+
 {% for site in sites %}
 
 <VirtualHost *:80>
