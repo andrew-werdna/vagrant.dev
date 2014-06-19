@@ -19,7 +19,7 @@ Built using simple [Ansible provisioning](http://www.ansible.com/) that works on
      
     ```
     $ cd vagrant.dev
-    $ vagrant up
+    $ vagrant up provider=virtualbox
     ```
 
 6. Wait for vagrant to download, start and provision your virtual machine (a few minutes)
@@ -31,7 +31,7 @@ Built using simple [Ansible provisioning](http://www.ansible.com/) that works on
 
 8. When the setup is done you can visit your local development host at http://vagrant.dev/
 9. Any files you add to the folder sites/vagrant.dev/webroot/ will be visible at http://vagrant.dev/
-10. Now you can configure your own sites, see the onfiguration section below. (TODO)
+10. Now you can configure your own sites, see the configuration section below.
 
 ## What's inside
 
@@ -163,3 +163,8 @@ sites:
     remote_source_path: /opt/deploy/project/webroot/sites/default/files/
     local_target_path: sites/default/files/
 ```
+
+
+## Troubleshooting
+
+Problems with empty responses on redirects? It might be XDebug, try turning off your current debug session.
