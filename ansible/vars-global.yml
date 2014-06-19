@@ -3,6 +3,8 @@
 extra_repos:
 - dest: /tmp/epel-release.rpm
   url: http://mirror.nsc.liu.se/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
+- dest: /tmp/webtatic-el6.rpm
+  url: http://mirror.webtatic.com/yum/el6/latest.rpm
 #- { dest: '/tmp/newrelic-repo.rpm', url: 'http://yum.newrelic.com/pub/newrelic/el5/x86_64/newrelic-repo-5-3.noarch.rpm' }
 #- { dest: '/tmp/varnish-repo.rpm', url: 'http://repo.varnish-cache.org/redhat/varnish-3.0/el6/noarch/varnish-release/varnish-release-3.0-1.el6.noarch.rpm' }
 #- { dest: '/tmp/epel-release.rpm', url: 'http://dl.iuscommunity.org/pub/ius/stable/CentOS/5/x86_64/epel-release-5-4.noarch.rpm' }

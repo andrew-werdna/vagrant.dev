@@ -75,6 +75,11 @@
 #- include: ../tasks/mailcatcher.yml
 - include: ../tasks/debug.yml
 
+- name: Checkout code from origin
+  git: repo={{item.origin}} dest={{sites_dir}}/{{item.host}} update=no
+  when: item.origin is defined
+  with_items: sites
+
 - name: Start Services
   service: name={{item}} state=started enabled=true
   with_items:
