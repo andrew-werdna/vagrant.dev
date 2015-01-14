@@ -8,17 +8,17 @@
   - memcached
   - httpd
   #- varnish
-  - php
-  - php-soap
-  - php-mcrypt
-  - php-xml
-  - php-mbstring
-  - php-mysql
-  - php-curl
-  - php-gd
-  - php-pecl-memcached
-  - php-pecl-xdebug
-  - php-pecl-apc
+  - php54w
+  - php54w-soap
+  - php54w-mcrypt
+  - php54w-xml
+  - php54w-mbstring
+  - php54w-mysql
+  - php54w-curl
+  - php54w-gd
+  - php54w-pecl-memcached
+  - php54w-pecl-xdebug
+  - php54w-pecl-apc
   #- newrelic-php5
   # HTTPS
   - mod_ssl
