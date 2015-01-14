@@ -6,12 +6,18 @@ EnableSendfile off
 
 {% for site in sites %}
 
+{%  if site.webroot is defined %}
+    {% set docroot = sites_dir ~ "/" ~ site.host ~ "/" ~ site.webroot %}
+{% else %}
+    {% set docroot = sites_dir ~ "/" ~ site.host %}
+{% endif %}
+
 <VirtualHost *:80>
   ServerName {{ site.host }}
-  DocumentRoot {{sites_dir}}/{{ site.host }}/{{ site.webroot }}
+  DocumentRoot {{docroot}}
   RewriteEngine On
   
-  <Directory {{sites_dir}}/{{ site.host }}/{{ site.webroot }} >
+  <Directory {{docroot}} >
     Options FollowSymLinks
     AllowOverride All
     Order allow,deny
@@ -55,10 +61,10 @@ EnableSendfile off
 
 <VirtualHost *:443>
   ServerName {{ site.host }}
-  DocumentRoot {{sites_dir}}/{{ site.host }}/{{ site.webroot }}
+  DocumentRoot {{docroot}}
   RewriteEngine On
   
-  <Directory {{sites_dir}}/{{ site.host }}/{{ site.webroot }}>
+  <Directory {{docroot}}>
     Options FollowSymLinks
     AllowOverride All
     Order allow,deny
