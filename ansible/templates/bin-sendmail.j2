@@ -1,15 +1,32 @@
 #!/usr/bin/php
 <?php
+
+// Get all input
 $input = file_get_contents('php://stdin');
-preg_match("|^To: .*?<(.*)>\n|", $input, $matches);
+
+
+// Set up a datestring for later use
 $datestring = date("Y-m-d\TH-i-s");
+
+// See if we can find the To: email address
+preg_match("|^To: .*?<(.*)>\n|", $input, $matches);
 if ( isset($matches[1]) ) {
+	// Email found, create a filename using that
 	$filename = tempnam('/var/log/mail', $datestring .'_'. $matches[1] . '.');
 } else {
+	// No email found, try another regex to find it again
 	preg_match("|^To: (.*)\n|", $input, $matches);
-	$filename = tempnam('/var/log/mail', $datestring .'_'. $matches[1] . '.');
-	if ( !isset($matches[1]) ) {
+	if ( isset($matches[1]) ) {
+		// Email found, create a filename using that
+		$filename = tempnam('/var/log/mail', $datestring .'_'. $matches[1] . '.');
+	} else {
+		// No email found, create filename without
 		$filename = tempnam('/var/log/mail', $datestring . '.');
 	}
 }
-file_put_contents($filename, $input);
+
+// Remove the empty temporary file
+unlink($filename);
+
+// Write all content to a new file with .txt file ending
+file_put_contents($filename . '.txt', $input);
