@@ -165,6 +165,6 @@ sites:
 ```
 
 
-## Troubleshooting
+## Known issues
 
-Problems with empty responses on redirects? It might be XDebug, try turning off your current debug session.
+None
