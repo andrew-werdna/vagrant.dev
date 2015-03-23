@@ -91,9 +91,9 @@
 #  with_subelements:
 #  - sites
 #  - rsync
-  
+
 - name: Download uploaded files to virtual machine (this will take a while)
-  command: rsync -rti -e 'ssh -i {{private_key_dir}}/{{item.1.ssh_private_key}} -o StrictHostKeyChecking=no' {{item.1.ssh_user}}@{{item.1.ssh_host}}:{{item.1.remote_source_path}} /vagrant/sites/{{item.0.host}}/{{item.0.webroot}}/{{item.1.local_target_path}}
+  command: rsync -rti -e 'ssh -i {{private_key_dir}}/{{item.1.ssh_private_key}} -o StrictHostKeyChecking=no' {{item.1.ssh_user}}@{{item.1.ssh_host}}:{{item.1.remote_source_path}} /vagrant/sites/{{item.0.host}}/{{item.1.local_target_path}}
   with_subelements:
   - sites
   - rsync
