@@ -44,7 +44,7 @@ Installed software:
 * ImageMagick
 * memcache
 * Xdebug
-* git, subversion
+* git
 * mc, vim, screen, tmux, curl
 * [MailCatcher](http://mailcatcher.me/)
 * [Drush](http://drupal.org/project/drush)

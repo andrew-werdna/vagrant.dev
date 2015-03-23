@@ -28,7 +28,6 @@
   - screen
   - tmux
   - curl
-  - subversion
 
 # Requires package yum-cron (runs nightly updates)
 #- name: Activate yum autoupdate
