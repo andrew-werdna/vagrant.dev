@@ -15,7 +15,7 @@ Built using simple [Ansible provisioning](http://www.ansible.com/) that works on
     ```
 
 4. Clone this repository to a folder of your choice (I have it in my home folder ~/vagrant)
-5. Change to the repository folder and start vagrant
+5. Change to the repository folder and start vagrant (make sure you have enough free RAM, VM is set to use 1600 MB by default)
      
     ```
     $ cd vagrant.dev
@@ -49,7 +49,7 @@ Installed software:
 * [MailCatcher](http://mailcatcher.me/)
 * [Drush](http://drupal.org/project/drush)
 
-The vagrant machine is set to use IP 33.33.33.10 by default.
+The vagrant machine is set to use IP 33.33.33.10 and 1600 MB RAM by default. 
 
 phpMyAdmin is available on every domain. For example:
 

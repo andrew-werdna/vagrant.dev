@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
 		#v.gui = true
 
 		# If you want to give your VM more memory, change this line
-		v.customize ["modifyvm", :id, "--memory", 1024]
+		v.customize ["modifyvm", :id, "--memory", 1600]
 
 		# Never set more than 1 cpu, it might heavily degrade performance
 		v.customize ["modifyvm", :id, "--cpus", 1]
