@@ -42,7 +42,7 @@
 #  tags: configure
 
 # TODO Yes this is kinda awful, but I don't think its possible to do with ansible itself
-- name: Copy database from other server
+- name: Copy database from other server (only when database just created above)
   shell: ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "mysqldump --routines -h{{item.item.1.db_copy.mysql_host}} -u{{item.item.1.db_copy.mysql_user}} -p{{item.item.1.db_copy.mysql_pass}} {{item.item.1.db_copy.remote_database}} > ~/vagrant-dump-{{item.item.1.db_name}}.sql " && scp -C -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}}:~/vagrant-dump-{{item.item.1.db_name}}.sql /home/vagrant/vagrant-dump-{{item.item.1.db_name}}.sql && ssh {{item.item.1.db_copy.ssh_user}}@{{item.item.1.db_copy.ssh_host}} -i {{private_key_dir}}/{{item.item.1.db_copy.ssh_private_key}} -o StrictHostKeyChecking=no "rm ~/vagrant-dump-{{item.item.1.db_name}}.sql"
   with_items: create_databases_result.results
   when: item.changed and item.item.1.db_copy.ssh_user is defined

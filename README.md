@@ -112,6 +112,8 @@ For this config to work you need an SSH account on a remote server and a MySQL a
 
 I use a single private key file without a passphrase for all the servers I need to sync databases and files from. This is a separate private key from the one I usually use, since it has no passphrase it is best to use it only for syncing from development and testing servers. Read more about public and private keys at [help.ubuntu.com](https://help.ubuntu.com/community/SSH/OpenSSH/Keys).
 
+A database copy will only be initiated when a database was just created on the VM. So to trigger a new copy, use phpmyadmin or another mysql client to delete your local database and ansible will then create a new database and copy over your remote content. (This could probably be improved)
+
 ```yaml
 sites:
 - id: copy
