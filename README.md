@@ -1,8 +1,8 @@
 # vagrant.dev
 
-Configurable LAMP development stack for Vagrant. Kind of like MAMP or WAMP but auto configuring and virtualized!
+Configurable LAMP development stack for Vagrant. Kind of like MAMP or WAMP but auto configuring and virtualized.
 
-Built using simple [Ansible provisioning](http://www.ansible.com/) that works on Windows by running entirely inside the VM!
+Built using the simple [Ansible provisioning](http://www.ansible.com/) that works on Windows by running it entirely inside the VM. Ansible is usually run on your local machine so it can manage multiple servers at once. The only downside to running it on the VM is that you don't get coloured output, and when an error happens the output can get a bit messy since its run through a bash script.
 
 ## Installation
 
@@ -60,8 +60,6 @@ PHP is configured to send mail via MailCatcher. Web frontend of MailCatcher is r
 * http://vagrant.dev:1080
 
 Port 33066 is forwarded to MySql, with a default vagrant/vagrant user so you can use your favorite client to administer databases.
-
-You can add XDEBUG\_PROFILE to your GET parameter to generate an xdebug trace, e.g. http://vagrant.dev/?XDEBUG\_PROFILE. You can then investigate at http://local.dev/webgrind/
 
 ## Sites configuration
 
