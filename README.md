@@ -46,7 +46,7 @@ Installed software:
 * Xdebug
 * git
 * mc, vim, screen, tmux, curl
-* [MailCatcher](http://mailcatcher.me/)
+* [MailHog](https://github.com/mailhog/MailHog)
 * [Drush](http://drupal.org/project/drush)
 
 The vagrant machine is set to use IP 33.33.33.10 and 1600 MB RAM by default. 
@@ -55,7 +55,7 @@ phpMyAdmin is available on every domain. For example:
 
 * http://vagrant.dev/phpmyadmin
 
-PHP is configured to send mail via MailCatcher. Web frontend of MailCatcher is running on port 1080 and also available on every domain:
+PHP is configured to send mail via Mailhog. Web frontend of Mailhog is running on port 1080 and also available on every domain:
 
 * http://vagrant.dev:1080
 

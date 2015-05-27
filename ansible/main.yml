@@ -23,6 +23,8 @@
   - include: main/web.yml
   handlers:
   - include: main/handlers.yml
+  #roles:
+  #- mailhog
 
 - name: Provision and deploy database servers
   hosts: dbservers
