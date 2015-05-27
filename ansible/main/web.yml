@@ -52,8 +52,11 @@
   notify: Restart Apache
   tags: configure
 
+- name: Configure | Remove old PHP configuration
+  file: state=absent path=/etc/php.d/sff.ini
+  tags: configure
 - name: Configure | PHP configuration
-  template: src=php-ini.j2 dest=/etc/php.d/sff.ini owner=root group=root mode=0644
+  template: src=php-ini.j2 dest=/etc/php.d/vagrant.ini owner=root group=root mode=0644
   notify: Restart Apache
   tags: configure
 
