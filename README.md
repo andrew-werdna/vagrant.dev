@@ -19,10 +19,10 @@ Built using the simple [Ansible provisioning](http://www.ansible.com/) that work
      
     ```
     $ cd vagrant.dev
-    $ vagrant up provider=virtualbox
+    $ vagrant up --provider=virtualbox
     ```
 
-6. Wait for vagrant to download, start and provision your virtual machine (a few minutes)
+6. Wait for vagrant to download, start and provision your virtual machine (up to 15 minutes)
 7. While waiting, add this row to your local machine's "hosts" file (Linux/Mac: "/etc/hosts")
 
     ```
