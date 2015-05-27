@@ -42,6 +42,9 @@ Vagrant.configure("2") do |config|
 	# Create a private network, which allows host-only access to the machine using a specific IP.
 	config.vm.network :private_network, ip: "33.33.33.10"
 
+	# Save host OS for later use
+	host = RbConfig::CONFIG['host_os']
+
 	# VirtualBox specific configuration
 	config.vm.provider :virtualbox do |v|
 
@@ -73,14 +76,24 @@ Vagrant.configure("2") do |config|
    "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then 
    umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
   
-  # Run ansible provision on virtual host
-  config.vm.provision :shell, :inline =>
-   "export PYTHONUNBUFFERED=1; ansible-playbook /vagrant/ansible/main.yml --inventory-file=/vagrant/ansible/hosts-local --user=vagrant"
+	if host =~ /darwin|linux/
+		config.vm.provision :ansible do |ansible|
+		    #ansible.verbose = true
+		    ansible.playbook = "ansible/main.yml"
+		    ansible.groups = {
+					  "webservers" => ["default"],
+					  "dbservers" => ["default"]
+					}
+				ansible.extra_vars = {
+					server_environment: "local",
+				}
+		end
+	else # Windows
+		# Run ansible provision on virtual host
+  	config.vm.provision :shell, :inline =>
+   		"export PYTHONUNBUFFERED=1; ansible-playbook /vagrant/ansible/main.yml --inventory-file=/vagrant/ansible/hosts-local --user=vagrant"
+	end
 
-  #config.vm.provision :ansible do |ansible|
-  #    ansible.verbose = true
-  #    ansible.inventory_path = "ansible/hosts-local"
-  #    ansible.playbook = "ansible/main.yml"
-  #end
+
 
 end
