@@ -7,7 +7,6 @@
   - ImageMagick 
   - memcached
   - httpd
-  #- varnish
   - php54w
   - php54w-soap
   - php54w-mcrypt
@@ -19,23 +18,15 @@
   - php54w-pecl-memcached
   - php54w-pecl-xdebug
   - php54w-pecl-apc
-  #- newrelic-php5
-  # HTTPS
+  - php-drush-drush
+  - phpmyadmin
   - mod_ssl
   - openssl
+  #- varnish
+  #- newrelic-php5
   #- php-pear   # Installs pecl command
   #- php-devel  # Required for pecl install
   #- memcached-devel # Required for "pecl install memcache"
-  - php-drush-drush
-  - phpmyadmin
-
-  # IUS repository php53 packages (later version)
-  #- php53u
-  #- php53u-mysql
-  #- php53u-curl
-  #- php53u-gd
-  #- php53u-pecl-memcached
-  #- php53u-pecl-xdebug
 
 - name: Allow everyone to read http logs
   file: state=directory path=/var/log/httpd owner=root group=root mode=0755
