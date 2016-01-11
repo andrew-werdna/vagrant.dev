@@ -22,3 +22,6 @@ private_key_dir: /privatekeys
 
 php_memory: 400M
 php_upload: 50M
+
+# Needed for drupals tablefield module when using large tables (each cell is an input field)
+php_max_input_vars: 10000
