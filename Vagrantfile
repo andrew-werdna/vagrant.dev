@@ -31,10 +31,16 @@ Vagrant.configure("2") do |config|
 	# Mount private keys folder with right permissions
 	config.vm.synced_folder "./privatekeys", "/privatekeys", owner: "vagrant", group: "vagrant", mount_options: ["dmode=700,fmode=600"]
 
+	#config.vm.synced_folder ".", "/vagrant",
+	#  type: "rsync",
+	#  rsync__auto: "true",
+	#  rsync__exclude: [".git/","privatekeys/"],
+	#  id: "vagrant-root"
+
 	# If you want to share using NFS uncomment this line 
 	# (30x faster performance on mac/linux hosts when using VirtualBox)
 	# http://docs.vagrantup.com/v2/synced-folders/nfs.html
-	#config.vm.synced_folder ".", "/vagrant", :nfs => true
+	#config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => true
 	
 	# Set the hostname
 	config.vm.hostname = "vagrant"
@@ -62,6 +68,22 @@ Vagrant.configure("2") do |config|
 		v.customize ["modifyvm", :id, "--nictype1", "virtio"]
 		v.customize ["modifyvm", :id, "--nictype2", "virtio"]
 		v.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "off"]
+
+		# Give VM 1/4 system memory & access to all cpu cores on the host
+#		if host =~ /darwin/
+#			cpus = `sysctl -n hw.ncpu`.to_i
+#			# sysctl returns Bytes and we need to convert to MB
+#			mem = `sysctl -n hw.memsize`.to_i / 1024 / 1024 / 4
+#		elsif host =~ /linux/
+#			cpus = `nproc`.to_i
+#			# meminfo shows KB and we need to convert to MB
+#			mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i / 1024 / 4
+#		else # sorry Windows folks, I can't help you
+#			cpus = 2
+#			mem = 1024
+#		end
+#	  v.customize ["modifyvm", :id, "--memory", mem]
+#	  v.customize ["modifyvm", :id, "--cpus", cpus]
 	end
 
 	#################################
@@ -72,13 +94,15 @@ Vagrant.configure("2") do |config|
 	config.vm.provision :shell, path: "provision.sh"
 
 	# Now with apache probably installed, remount /vagrant with apache group permission
-  config.vm.provision :shell, run: "always", :inline =>
-   "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then 
-   umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
-  
+  #config.vm.provision :shell, run: "always", :inline =>
+  # "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then 
+  # umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
+  # Only works with default shared folder
+
 	if host =~ /darwin|linux/
 		config.vm.provision :ansible do |ansible|
 		    #ansible.verbose = true
+		    #ansible.inventory_path = "ansible/hosts-vagrant"
 		    ansible.playbook = "ansible/main.yml"
 		    ansible.groups = {
 					  "webservers" => ["default"],
