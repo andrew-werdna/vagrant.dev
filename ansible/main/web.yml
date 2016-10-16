@@ -4,20 +4,20 @@
   yum: name={{item}} state=present
   tags: install
   with_items:
-  - ImageMagick 
+  - ImageMagick
   - memcached
   - httpd
-  - php54w
-  - php54w-soap
-  - php54w-mcrypt
-  - php54w-xml
-  - php54w-mbstring
-  - php54w-mysql
-  - php54w-curl
-  - php54w-gd
-  - php54w-pecl-memcached
-  - php54w-pecl-xdebug
-  - php54w-pecl-apc
+  - php56w
+  - php56w-soap
+  - php56w-mcrypt
+  - php56w-xml
+  - php56w-mbstring
+  - php56w-mysql
+  - php56w-curl
+  - php56w-gd
+  - php56w-pecl-memcached
+  - php56w-pecl-xdebug
+  - php56w-pecl-apcu
   - php-drush-drush
   - phpmyadmin
   - mod_ssl
@@ -92,9 +92,8 @@
   - sites
   - rsync
   when: item.1.ssh_host is defined
-  tags: 
+  tags:
   - sync
   - configure
   register: rsync_result
   changed_when: rsync_result.stdout != ""
-
