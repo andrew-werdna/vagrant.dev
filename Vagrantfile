@@ -28,14 +28,14 @@ Vagrant.configure("2") do |config|
 	# Set permissions for shared folder, otherwise all files might become executable which ansible doesn't like
 	config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=664"]
 
-	# Mount private keys folder with right permissions
-	config.vm.synced_folder "./privatekeys", "/privatekeys", owner: "vagrant", group: "vagrant", mount_options: ["dmode=700,fmode=600"]
-
-	# If you want to share using NFS uncomment this line 
+	# If you want to share using NFS uncomment this line
 	# (30x faster performance on mac/linux hosts when using VirtualBox)
 	# http://docs.vagrantup.com/v2/synced-folders/nfs.html
 	#config.vm.synced_folder ".", "/vagrant", :nfs => true
-	
+
+	# Mount private keys folder with right permissions
+	config.vm.synced_folder "./privatekeys", "/privatekeys", owner: "vagrant", group: "vagrant", mount_options: ["dmode=700,fmode=600"]
+
 	# Set the hostname
 	config.vm.hostname = "vagrant"
 
@@ -67,15 +67,15 @@ Vagrant.configure("2") do |config|
 	#################################
 	# Provisioners                  #
 	#################################
-	
+
 	# Install initial requirements
 	config.vm.provision :shell, path: "provision.sh"
 
 	# Now with apache probably installed, remount /vagrant with apache group permission
   config.vm.provision :shell, run: "always", :inline =>
-   "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then 
+   "if [[ -f /etc/sysconfig/httpd && $(stat -c \"%G\" /vagrant) != \"apache\" ]]; then
    umount /vagrant && mount -t vboxsf -o uid=`id -u vagrant`,gid=`id -g apache`,dmode=775,fmode=664 vagrant-root /vagrant ; fi"
-  
+
 	if host =~ /darwin|linux/
 		config.vm.provision :ansible do |ansible|
 		    #ansible.verbose = true

@@ -19,15 +19,22 @@
   - git
   - nano
   - mlocate
-  - python-simplejson # Required for many ansible modules
-  - libselinux-python # Required for ansible file operations on servers that have SElinux enabled
-  - python-keyczar  # Required for ansible accelerated mode
+  - centos-release-SCL
   # Extra utils
   - mc
   - vim
   - screen
   - tmux
   - curl
+
+- name: update python and install some more packages
+  yum: name={{item}} state=present
+  tags: install
+  with_items:
+  - python27
+  - python-simplejson # Required for many ansible modules
+  - libselinux-python # Required for ansible file operations on servers that have SElinux enabled
+  - python-keyczar  # Required for ansible accelerated mode
 
 # Requires package yum-cron (runs nightly updates)
 #- name: Activate yum autoupdate
